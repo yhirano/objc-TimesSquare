@@ -27,6 +27,12 @@
  */
 @property (nonatomic, strong) NSDate *firstOfMonth;
 
+/** The last day of the month this cell is currently representing.
+ 
+ This can be useful for calculations and for display.
+ */
+@property (nonatomic, strong) NSDate *lastOfMonth;
+
 /** How many days there are in a week.
  
  This is usually 7.

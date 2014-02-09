@@ -55,62 +55,90 @@
 {
     NSMutableArray *dayButtons = [NSMutableArray arrayWithCapacity:self.daysInWeek];
     for (NSUInteger index = 0; index < self.daysInWeek; index++) {
-        UIButton *button = [[UIButton alloc] initWithFrame:self.contentView.bounds];
-        [button addTarget:self action:@selector(dateButtonPressed:) forControlEvents:UIControlEventTouchDown];
-        [dayButtons addObject:button];
+        UIButton *button = [self dayButton];
         [self.contentView addSubview:button];
-        [self configureButton:button];
-        [button setTitleColor:[self.textColor colorWithAlphaComponent:0.5f] forState:UIControlStateDisabled];
+
+        [dayButtons addObject:button];
+        [button addTarget:self action:@selector(dateButtonPressed:) forControlEvents:UIControlEventTouchDown];
     }
     self.dayButtons = dayButtons;
+}
+
+- (UIButton*)dayButton;
+{
+    UIButton *button = [[UIButton alloc] initWithFrame:self.contentView.bounds];
+    [self configureButton:button];
+    [button setTitleColor:[self.textColor colorWithAlphaComponent:0.5f] forState:UIControlStateDisabled];
+    return button;
 }
 
 - (void)createNotThisMonthButtons;
 {
     NSMutableArray *notThisMonthButtons = [NSMutableArray arrayWithCapacity:self.daysInWeek];
     for (NSUInteger index = 0; index < self.daysInWeek; index++) {
-        UIButton *button = [[UIButton alloc] initWithFrame:self.contentView.bounds];
-        [notThisMonthButtons addObject:button];
-        [self.contentView addSubview:button];
-        [self configureButton:button];
-
+        UIButton *button = [self notThisMonthButton];
         button.enabled = NO;
-        UIColor *backgroundPattern = [UIColor colorWithPatternImage:[self notThisMonthBackgroundImage]];
-        button.backgroundColor = backgroundPattern;
-        button.titleLabel.backgroundColor = backgroundPattern;
+
+        [self.contentView addSubview:button];
+        [notThisMonthButtons addObject:button];
     }
     self.notThisMonthButtons = notThisMonthButtons;
 }
 
+- (UIButton*)notThisMonthButton;
+{
+    UIButton *button = [[UIButton alloc] initWithFrame:self.contentView.bounds];
+    [self configureButton:button];
+    UIColor *backgroundPattern = [UIColor colorWithPatternImage:[self notThisMonthBackgroundImage]];
+    button.backgroundColor = backgroundPattern;
+    button.titleLabel.backgroundColor = backgroundPattern;
+    return button;
+}
+
 - (void)createTodayButton;
 {
-    self.todayButton = [[UIButton alloc] initWithFrame:self.contentView.bounds];
-    [self.contentView addSubview:self.todayButton];
-    [self configureButton:self.todayButton];
-    [self.todayButton addTarget:self action:@selector(todayButtonPressed:) forControlEvents:UIControlEventTouchDown];
-    
-    [self.todayButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [self.todayButton setBackgroundImage:[self todayBackgroundImage] forState:UIControlStateNormal];
-    [self.todayButton setTitleShadowColor:[UIColor colorWithWhite:0.0f alpha:0.75f] forState:UIControlStateNormal];
+    _todayButton = [self todayButton];
+    [self.contentView addSubview:_todayButton];
+    [_todayButton addTarget:self action:@selector(todayButtonPressed:) forControlEvents:UIControlEventTouchDown];
+}
 
-    self.todayButton.titleLabel.shadowOffset = CGSizeMake(0.0f, -1.0f / [UIScreen mainScreen].scale);
+- (UIButton*)todayButton;
+{
+    UIButton *button = [[UIButton alloc] initWithFrame:self.contentView.bounds];
+    [self configureButton:button];
+
+    [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [button setBackgroundImage:[self todayBackgroundImage] forState:UIControlStateNormal];
+    [button setTitleShadowColor:[UIColor colorWithWhite:0.0f alpha:0.75f] forState:UIControlStateNormal];
+    
+    button.titleLabel.shadowOffset = CGSizeMake(0.0f, -1.0f / [UIScreen mainScreen].scale);
+
+    return button;
 }
 
 - (void)createSelectedButton;
 {
-    self.selectedButton = [[UIButton alloc] initWithFrame:self.contentView.bounds];
-    [self.contentView addSubview:self.selectedButton];
-    [self configureButton:self.selectedButton];
-    
-    [self.selectedButton setAccessibilityTraits:UIAccessibilityTraitSelected|self.selectedButton.accessibilityTraits];
-    
-    self.selectedButton.enabled = NO;
-    [self.selectedButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [self.selectedButton setBackgroundImage:[self selectedBackgroundImage] forState:UIControlStateNormal];
-    [self.selectedButton setTitleShadowColor:[UIColor colorWithWhite:0.0f alpha:0.75f] forState:UIControlStateNormal];
-    
-    self.selectedButton.titleLabel.shadowOffset = CGSizeMake(0.0f, -1.0f / [UIScreen mainScreen].scale);
+    _selectedButton = [self selectedButton];
+    _selectedButton.enabled = NO;
+    [_selectedButton setAccessibilityTraits:UIAccessibilityTraitSelected|_selectedButton.accessibilityTraits];
+
+    [self.contentView addSubview:_selectedButton];
+
     self.indexOfSelectedButton = -1;
+}
+
+- (UIButton*)selectedButton;
+{
+    UIButton *button = [[UIButton alloc] initWithFrame:self.contentView.bounds];
+    [self configureButton:button];
+    
+    [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [button setBackgroundImage:[self selectedBackgroundImage] forState:UIControlStateNormal];
+    [button setTitleShadowColor:[UIColor colorWithWhite:0.0f alpha:0.75f] forState:UIControlStateNormal];
+    
+    button.titleLabel.shadowOffset = CGSizeMake(0.0f, -1.0f / [UIScreen mainScreen].scale);
+
+    return button;
 }
 
 - (void)setBeginningDate:(NSDate *)date;
@@ -127,18 +155,16 @@
     NSDateComponents *offset = [NSDateComponents new];
     offset.day = 1;
 
-    self.todayButton.hidden = YES;
+    _todayButton.hidden = YES;
     self.indexOfTodayButton = -1;
-    self.selectedButton.hidden = YES;
+    _selectedButton.hidden = YES;
     self.indexOfSelectedButton = -1;
     
     for (NSUInteger index = 0; index < self.daysInWeek; index++) {
-        NSString *title = [self.dayFormatter stringFromDate:date];
-        NSString *accessibilityLabel = [self.accessibilityFormatter stringFromDate:date];
-        [self.dayButtons[index] setTitle:title forState:UIControlStateNormal];
-        [self.dayButtons[index] setAccessibilityLabel:accessibilityLabel];
-        [self.notThisMonthButtons[index] setTitle:title forState:UIControlStateNormal];
-        [self.notThisMonthButtons[index] setAccessibilityLabel:accessibilityLabel];
+        [self setTitleToDayButton:self.dayButtons[index] date:date];
+        [self setAccessibilityLabelToDayButton:self.dayButtons[index] date:date];
+        [self setTitleToNotThisMonthButton:self.notThisMonthButtons[index] date:date];
+        [self setAccessibilityLabelToNotThisMonthButton:self.notThisMonthButtons[index] date:date];
         
         NSDateComponents *thisDateComponents = [self.calendar components:NSDayCalendarUnit|NSMonthCalendarUnit|NSYearCalendarUnit fromDate:date];
         
@@ -151,9 +177,9 @@
         } else {
 
             if ([self.todayDateComponents isEqual:thisDateComponents]) {
-                self.todayButton.hidden = NO;
-                [self.todayButton setTitle:title forState:UIControlStateNormal];
-                [self.todayButton setAccessibilityLabel:accessibilityLabel];
+                _todayButton.hidden = NO;
+                [self setTitleToTodayButton:_todayButton date:date];
+                [self setAccessibilityLabelToTodayButton:_todayButton date:date];
                 self.indexOfTodayButton = index;
             } else {
                 UIButton *button = self.dayButtons[index];
@@ -164,6 +190,43 @@
 
         date = [self.calendar dateByAddingComponents:offset toDate:date options:0];
     }
+}
+
+- (void)setTitleToDayButton:(UIButton*)button date:(NSDate*)date
+{
+    NSString *title = [self.dayFormatter stringFromDate:date];
+    [button setTitle:title forState:UIControlStateNormal];
+}
+
+- (void)setAccessibilityLabelToDayButton:(UIButton*)button date:(NSDate*)date
+{
+    NSString *accessibilityLabel = [self.accessibilityFormatter stringFromDate:date];
+    [button setAccessibilityLabel:accessibilityLabel];
+}
+
+- (void)setTitleToNotThisMonthButton:(UIButton*)button date:(NSDate*)date
+{
+    NSString *title = [self.dayFormatter stringFromDate:date];
+    [button setTitle:title forState:UIControlStateNormal];
+}
+
+- (void)setAccessibilityLabelToNotThisMonthButton:(UIButton*)button date:(NSDate*)date
+{
+    NSString *accessibilityLabel = [self.accessibilityFormatter stringFromDate:date];
+    [button setAccessibilityLabel:accessibilityLabel];
+}
+
+
+- (void)setTitleToTodayButton:(UIButton*)button date:(NSDate*)date
+{
+    NSString *title = [self.dayFormatter stringFromDate:date];
+    [button setTitle:title forState:UIControlStateNormal];
+}
+
+- (void)setAccessibilityLabelToTodayButton:(UIButton*)button date:(NSDate*)date
+{
+    NSString *accessibilityLabel = [self.accessibilityFormatter stringFromDate:date];
+    [button setAccessibilityLabel:accessibilityLabel];
 }
 
 - (void)setBottomRow:(BOOL)bottomRow;
@@ -216,10 +279,10 @@
     notThisMonthButton.frame = rect;
 
     if (self.indexOfTodayButton == (NSInteger)index) {
-        self.todayButton.frame = rect;
+        _todayButton.frame = rect;
     }
     if (self.indexOfSelectedButton == (NSInteger)index) {
-        self.selectedButton.frame = rect;
+        _selectedButton.frame = rect;
     }
 }
 
@@ -243,11 +306,11 @@
     self.indexOfSelectedButton = newIndexOfSelectedButton;
     
     if (newIndexOfSelectedButton >= 0) {
-        self.selectedButton.hidden = NO;
-        [self.selectedButton setTitle:[self.dayButtons[newIndexOfSelectedButton] currentTitle] forState:UIControlStateNormal];
-        [self.selectedButton setAccessibilityLabel:[self.dayButtons[newIndexOfSelectedButton] accessibilityLabel]];
+        _selectedButton.hidden = NO;
+        [_selectedButton setTitle:[self.dayButtons[newIndexOfSelectedButton] currentTitle] forState:UIControlStateNormal];
+        [_selectedButton setAccessibilityLabel:[self.dayButtons[newIndexOfSelectedButton] accessibilityLabel]];
     } else {
-        self.selectedButton.hidden = YES;
+        _selectedButton.hidden = YES;
     }
     
     [self setNeedsLayout];
