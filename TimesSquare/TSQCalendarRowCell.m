@@ -208,6 +208,7 @@
 {
     NSString *title = [self.dayFormatter stringFromDate:date];
     [button setTitle:title forState:UIControlStateNormal];
+    [button setTitle:title forState:UIControlStateDisabled];
 }
 
 - (void)setAccessibilityLabelToNotThisMonthButton:(UIButton*)button date:(NSDate*)date
@@ -306,9 +307,11 @@
     self.indexOfSelectedButton = newIndexOfSelectedButton;
     
     if (newIndexOfSelectedButton >= 0) {
-        _selectedButton.hidden = NO;
-        [_selectedButton setTitle:[self.dayButtons[newIndexOfSelectedButton] currentTitle] forState:UIControlStateNormal];
-        [_selectedButton setAccessibilityLabel:[self.dayButtons[newIndexOfSelectedButton] accessibilityLabel]];
+        self.selectedButton.hidden = NO;
+        NSString *newTitle = [self.dayButtons[newIndexOfSelectedButton] currentTitle];
+        [self.selectedButton setTitle:newTitle forState:UIControlStateNormal];
+        [self.selectedButton setTitle:newTitle forState:UIControlStateDisabled];
+        [self.selectedButton setAccessibilityLabel:[self.dayButtons[newIndexOfSelectedButton] accessibilityLabel]];
     } else {
         _selectedButton.hidden = YES;
     }
