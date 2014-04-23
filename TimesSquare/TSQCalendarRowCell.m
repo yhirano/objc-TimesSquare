@@ -196,6 +196,7 @@
 {
     NSString *title = [self.dayFormatter stringFromDate:date];
     [button setTitle:title forState:UIControlStateNormal];
+    [button setTitle:title forState:UIControlStateDisabled];
 }
 
 - (void)setAccessibilityLabelToDayButton:(UIButton*)button date:(NSDate*)date
@@ -222,6 +223,7 @@
 {
     NSString *title = [self.dayFormatter stringFromDate:date];
     [button setTitle:title forState:UIControlStateNormal];
+    [button setTitle:title forState:UIControlStateDisabled];
 }
 
 - (void)setAccessibilityLabelToTodayButton:(UIButton*)button date:(NSDate*)date
