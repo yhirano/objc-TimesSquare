@@ -309,11 +309,11 @@
     self.indexOfSelectedButton = newIndexOfSelectedButton;
     
     if (newIndexOfSelectedButton >= 0) {
-        self.selectedButton.hidden = NO;
+        _selectedButton.hidden = NO;
         NSString *newTitle = [self.dayButtons[newIndexOfSelectedButton] currentTitle];
-        [self.selectedButton setTitle:newTitle forState:UIControlStateNormal];
-        [self.selectedButton setTitle:newTitle forState:UIControlStateDisabled];
-        [self.selectedButton setAccessibilityLabel:[self.dayButtons[newIndexOfSelectedButton] accessibilityLabel]];
+        [_selectedButton setTitle:newTitle forState:UIControlStateNormal];
+        [_selectedButton setTitle:newTitle forState:UIControlStateDisabled];
+        [_selectedButton setAccessibilityLabel:[self.dayButtons[newIndexOfSelectedButton] accessibilityLabel]];
     } else {
         _selectedButton.hidden = YES;
     }
